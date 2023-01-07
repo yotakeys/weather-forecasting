@@ -1,0 +1,3 @@
+- Mengdrop semua column tip[e 'object'
+- mengisi NaN dengan 0
+- Model menggunakan Linear Regression
