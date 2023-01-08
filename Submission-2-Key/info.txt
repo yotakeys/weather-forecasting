@@ -1,0 +1,5 @@
+- drop na rain
+- drop na column
+- exclude object
+- xgboost
+- <0 = 0
