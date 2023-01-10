@@ -123,9 +123,13 @@ class WeatherForecast:
         
     def randomForest(self):
         
-        from sklearn.ensemble import RandomForestRegressor
+        # from sklearn.ensemble import RandomForestRegressor
         
-        self.model = RandomForestRegressor()
+        # self.model = RandomForestRegressor()
+        
+        from xgboost import XGBRegressor
+        
+        self.model = XGBRegressor()
         
         def mines(x):
             if x < 0:
@@ -138,7 +142,7 @@ class WeatherForecast:
 
             self.output = pd.DataFrame({'id': self.test_data.id,
                         'rain_sum (mm)': self.predictions})
-            self.output.to_csv('submission-8-key.csv', index=False)
+            self.output.to_csv('submission-9-key.csv', index=False)
             
             
         else:
