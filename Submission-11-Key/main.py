@@ -42,6 +42,7 @@ class WeatherForecast:
     
     output_desc = pd.DataFrame()
     
+    testing_city = pd.DataFrame()
     
     def __init__(self, mode=0):
         self.mode = mode
@@ -95,14 +96,22 @@ class WeatherForecast:
 
         self.X = pd.merge(self.train_clean, train_mean_hourly, how='left', on = ['time','city'], suffixes = ['_d','_h'] )
         
-        from sklearn.preprocessing import OrdinalEncoder
+        self.testing_city = self.X[['city',self.y_str]].groupby(['city']).mean().sort_values(by=[self.y_str]).reset_index()
+        self.testing_city['id'] = pd.DataFrame([1,2,3,4,5,6,7,8,9,10])
+        self.X['city_sort_id'] = self.X['city'].map(self.testing_city.set_index(['city'])['id'])
+        self.X['city_rain_mean'] = self.X['city'].map(self.testing_city.set_index(['city'])[self.y_str])
         
-        ordinal_encoder = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value= np.nan)
+        # from sklearn.preprocessing import OrdinalEncoder
         
-        s = (self.X.dtypes == 'object')
-        object_cols = list(s[s].index)
-        self.X[['city']] = ordinal_encoder.fit_transform(self.X[['city']])
+        # ordinal_encoder = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value= np.nan)
+        # self.X[['city']] = ordinal_encoder.fit_transform(self.X[['city']])
+
+        # self.X['time-encode'] = self.X.apply(lambda row: (100 * float(row.time.split('-')[0][2:])) + (10 *float(row.time.split('-')[1])) 
+        #                                                               + float(row.time.split('-')[2]) )
         
+        # plt.scatter(self.X['city'], self.X[self.y_str])
+        # plt.show()
+     
         self.X = self.X.select_dtypes(exclude='object').drop([self.y_str], axis = 1)
         self.Y = self.train_clean[self.y_str]
         
@@ -116,35 +125,24 @@ class WeatherForecast:
             s = (self.X_test.dtypes == 'object')
             object_cols = list(s[s].index)
             
-            self.X_test[['city']] = ordinal_encoder.transform(self.X_test[['city']])
+            self.X_test['city_sort_id'] = self.X_test['city'].map(self.testing_city.set_index(['city'])['id'])
+            self.X_test['city_rain_mean'] = self.X_test['city'].map(self.testing_city.set_index(['city'])[self.y_str])
+            
+            
+            # self.X_test[['city']] = ordinal_encoder.transform(self.X_test[['city']])
             self.X_test = self.X_test.select_dtypes(exclude='object').drop(['id'], axis = 1)
         
         
         
     def randomForest(self):
         
-        # from sklearn.ensemble import RandomForestRegressor
+        from sklearn.ensemble import RandomForestRegressor
         
-        # self.model = RandomForestRegressor()
+        self.model = RandomForestRegressor()
         
         from xgboost import XGBRegressor
         
-        # self.model = XGBRegressor()
-        from sklearn.model_selection import RandomizedSearchCV
-        xgbr = XGBRegressor()
-        params = { 'max_depth': [3, 5, 6, 10, 15, 20],
-            'learning_rate': [0.01, 0.1, 0.2, 0.3],
-            'subsample': np.arange(0.5, 1.0, 0.1),
-            'colsample_bytree': np.arange(0.4, 1.0, 0.1),
-            'colsample_bylevel': np.arange(0.4, 1.0, 0.1),
-            'n_estimators': [100, 500, 1000]}
-        
-        self.model = RandomizedSearchCV(estimator=xgbr,
-                          param_distributions=params,
-                          scoring='neg_mean_squared_error',
-                          n_iter=25,
-                          verbose=1)
-        
+        self.model = XGBRegressor()
         
         def mines(x):
             if x < 0:
@@ -157,12 +155,12 @@ class WeatherForecast:
 
             self.output = pd.DataFrame({'id': self.test_data.id,
                         'rain_sum (mm)': self.predictions})
-            self.output.to_csv('submission-10-key.csv', index=False)
+            self.output.to_csv('submission-11-key.csv', index=False)
             
             
         else:
             from sklearn.model_selection import train_test_split
-            x_train, x_test, y_train, y_test = train_test_split(self.X, self.Y, train_size= 0.8, random_state=6)
+            x_train, x_test, y_train, y_test = train_test_split(self.X, self.Y, train_size= 0.8, random_state=8)
             self.model.fit(x_train, y_train)
             
             self.predictions = self.model.predict(x_test)
@@ -174,4 +172,4 @@ class WeatherForecast:
     
 if __name__ == '__main__':
     
-    Mod = WeatherForecast(mode = 0)
+    Mod = WeatherForecast(mode = 1)
