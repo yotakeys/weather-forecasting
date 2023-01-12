@@ -193,7 +193,7 @@ class WeatherForecast:
             
         else:
             from sklearn.model_selection import train_test_split
-            x_train, x_test, y_train, y_test = train_test_split(self.X, self.Y, train_size= 0.75, random_state=200)
+            x_train, x_test, y_train, y_test = train_test_split(self.X, self.Y, train_size= 0.75, random_state=27)
             self.model.fit(x_train, y_train)
             
             self.predictions = self.model.predict(x_test)
@@ -205,4 +205,4 @@ class WeatherForecast:
     
 if __name__ == '__main__':
     
-    Mod = WeatherForecast(mode = 1)
+    Mod = WeatherForecast(mode = 0)
