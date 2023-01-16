@@ -90,7 +90,7 @@ class WeatherForecast:
         # train data
         self.train_clean = self.train_data.dropna(subset = [self.y_str])
         # self.train_clean = self.train_clean.fillna(self.train_clean.median().iloc[0])
-        self.train_clean = self.train_clean.dropna(axis=1)
+        self.train_clean = self.train_clean.dropna()
         
       
     def featureEngineering(self):
@@ -163,7 +163,7 @@ class WeatherForecast:
 
             self.output = pd.DataFrame({'id': self.test_data.id,
                         'rain_sum (mm)': self.predictions})
-            self.output.to_csv('submission-17-key.csv', index=False)
+            self.output.to_csv('submission-24-key.csv', index=False)
             
             
         else:
@@ -180,4 +180,4 @@ class WeatherForecast:
     
 if __name__ == '__main__':
     
-    Mod = WeatherForecast(mode = 0)
+    Mod = WeatherForecast(mode = 1)
